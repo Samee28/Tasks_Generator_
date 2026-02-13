@@ -1,6 +1,8 @@
 // State Management
 let currentSpec = null;
 const MAX_HISTORY = 5;
+const MAX_TEXT_PREVIEW_LENGTH = 50;
+const MAX_GOAL_PREVIEW_LENGTH = 100;
 
 // DOM Elements
 const featureForm = document.getElementById('featureForm');
@@ -77,8 +79,22 @@ function generateTasks(spec) {
 }
 
 function generateUserStories(spec) {
+    // Extract a meaningful benefit from the goal
+    const goalLower = spec.goal.toLowerCase();
+    let benefit = 'achieve my objectives';
+    
+    if (goalLower.includes('secure') || goalLower.includes('safety')) {
+        benefit = 'ensure security and safety';
+    } else if (goalLower.includes('fast') || goalLower.includes('quick') || goalLower.includes('speed')) {
+        benefit = 'work more efficiently';
+    } else if (goalLower.includes('easy') || goalLower.includes('simple')) {
+        benefit = 'have a better user experience';
+    } else if (goalLower.includes('manage') || goalLower.includes('control')) {
+        benefit = 'have better control and management';
+    }
+    
     const stories = [
-        `As a ${spec.users}, I want to ${extractFirstSentence(spec.goal)} so that I can achieve my objectives`,
+        `As a ${spec.users}, I want to ${extractFirstSentence(spec.goal)} so that I can ${benefit}`,
         `As a ${spec.users}, I need a clear interface to interact with this feature`,
         `As a ${spec.users}, I want to see immediate feedback when using this feature`
     ];
@@ -109,7 +125,7 @@ function generateEngineeringTasks(spec) {
 
 function extractFirstSentence(text) {
     const match = text.match(/^[^.!?]+[.!?]/);
-    return match ? match[0] : text.substring(0, 50);
+    return match ? match[0] : text.substring(0, MAX_TEXT_PREVIEW_LENGTH);
 }
 
 // Rendering
@@ -364,7 +380,7 @@ function renderHistory(history) {
         div.className = 'history-item';
         
         const date = new Date(spec.timestamp).toLocaleString();
-        const goalPreview = spec.goal.substring(0, 100) + (spec.goal.length > 100 ? '...' : '');
+        const goalPreview = spec.goal.substring(0, MAX_GOAL_PREVIEW_LENGTH) + (spec.goal.length > MAX_GOAL_PREVIEW_LENGTH ? '...' : '');
         
         div.innerHTML = `
             <div class="history-header">

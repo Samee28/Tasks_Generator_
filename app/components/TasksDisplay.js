@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { exportAsMarkdown, exportAsText, downloadFile } from '@/app/lib/storage';
+import { useState, useEffect } from 'react';
+import { exportAsMarkdown, exportAsText, downloadFile, getRecentSpecs, saveSpec } from '@/app/lib/storage';
 
 export default function TasksDisplay({ spec, onClose }) {
   const [items, setItems] = useState(spec.data?.userStories || []);
@@ -10,6 +10,8 @@ export default function TasksDisplay({ spec, onClose }) {
   const [activeTab, setActiveTab] = useState('stories');
   const [editingId, setEditingId] = useState(null);
   const [groupFilter, setGroupFilter] = useState('all');
+  const [isAddingNew, setIsAddingNew] = useState(false);
+  const [newItem, setNewItem] = useState({ title: '', description: '', priority: 'medium', group: '' });
 
   const allItems = [...items, ...tasks];
   const groups = [...new Set(allItems.map(item => item.group).filter(Boolean))];
@@ -42,6 +44,37 @@ export default function TasksDisplay({ spec, onClose }) {
       [newList[index], newList[newIndex]] = [newList[newIndex], newList[index]];
       activeTab === 'stories' ? setItems(newList) : setTasks(newList);
     }
+  };
+
+  const handleAddNew = () => {
+    if (!newItem.title.trim() || !newItem.description.trim()) return;
+    
+    const item = {
+      id: activeTab === 'stories' ? `S${items.length + 1}` : `T${tasks.length + 1}`,
+      ...newItem,
+    };
+    
+    if (activeTab === 'stories') {
+      setItems([...items, item]);
+    } else {
+      setTasks([...tasks, item]);
+    }
+    
+    setNewItem({ title: '', description: '', priority: 'medium', group: '' });
+    setIsAddingNew(false);
+  };
+
+  const handleSaveEdits = () => {
+    const updatedSpec = {
+      ...spec,
+      data: {
+        userStories: items,
+        engineeringTasks: tasks,
+        risks: risks,
+      },
+      updatedAt: new Date().toISOString(),
+    };
+    saveSpec(updatedSpec);
   };
 
   const filteredItems = activeTab === 'stories' 
@@ -85,31 +118,37 @@ export default function TasksDisplay({ spec, onClose }) {
   const renderItem = (item, index, list) => (
     <div key={item.id} className="border-l-4 border-blue-500 bg-blue-50 p-4 mb-3 rounded">
       {editingId === item.id ? (
-        <div className="space-y-2">
-          <input
-            type="text"
-            value={item.title}
-            onChange={(e) => handleEdit(item.id, 'title', e.target.value)}
-            className="w-full px-2 py-1 border rounded"
-          />
-          <textarea
-            value={item.description}
-            onChange={(e) => handleEdit(item.id, 'description', e.target.value)}
-            className="w-full px-2 py-1 border rounded"
-            rows="2"
-          />
-          <div className="flex gap-2">
+        <div className="space-y-4 bg-white p-4 rounded border-2 border-blue-300">
+          <div>
+            <label className="block text-lg font-bold text-gray-900 mb-2">📌 Title</label>
+            <input
+              type="text"
+              value={item.title}
+              onChange={(e) => handleEdit(item.id, 'title', e.target.value)}
+              className="w-full px-4 py-3 border-2 border-gray-500 rounded font-semibold text-lg text-gray-900 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-200"
+            />
+          </div>
+          <div>
+            <label className="block text-lg font-bold text-gray-900 mb-2">📝 Description</label>
+            <textarea
+              value={item.description}
+              onChange={(e) => handleEdit(item.id, 'description', e.target.value)}
+              className="w-full px-4 py-3 border-2 border-gray-500 rounded font-semibold text-lg text-gray-900 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-200"
+              rows="4"
+            />
+          </div>
+          <div className="flex gap-3">
             <button
               onClick={() => setEditingId(null)}
-              className="px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700"
+              className="px-5 py-2 bg-green-600 text-white rounded text-base font-bold hover:bg-green-700 transition"
             >
-              Done
+              ✓ Done
             </button>
             <button
               onClick={() => handleDelete(item.id)}
-              className="px-3 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700"
+              className="px-5 py-2 bg-red-600 text-white rounded text-base font-bold hover:bg-red-700 transition"
             >
-              Delete
+              🗑️ Delete
             </button>
           </div>
         </div>
@@ -117,37 +156,37 @@ export default function TasksDisplay({ spec, onClose }) {
         <div>
           <div className="flex items-start justify-between mb-2">
             <div>
-              <h4 className="font-semibold text-gray-800">{item.id}: {item.title}</h4>
-              <p className="text-sm text-gray-600 mt-1">{item.description}</p>
+              <h4 className="font-bold text-lg text-gray-800">{item.id}: {item.title}</h4>
+              <p className="text-base text-gray-700 mt-2">{item.description}</p>
             </div>
             <span className="text-xs font-semibold px-2 py-1 bg-yellow-100 text-yellow-800 rounded">
               {item.priority}
             </span>
           </div>
           {item.group && (
-            <p className="text-xs text-gray-500 mb-2">Group: {item.group}</p>
+            <p className="text-sm text-gray-600 mb-2">Group: {item.group}</p>
           )}
           {activeTab === 'tasks' && item.estimatedHours && (
-            <p className="text-xs text-gray-500 mb-2">Estimated: {item.estimatedHours}h</p>
+            <p className="text-sm text-gray-600 mb-2">Estimated: {item.estimatedHours}h</p>
           )}
           <div className="flex gap-2 mt-3">
             <button
               onClick={() => setEditingId(item.id)}
-              className="px-2 py-1 bg-blue-600 text-white rounded text-xs hover:bg-blue-700"
+              className="px-3 py-2 bg-blue-600 text-white rounded text-sm font-bold hover:bg-blue-700"
             >
-              Edit
+              ✏️ Edit
             </button>
             <button
               onClick={() => handleReorder(index, 'up')}
               disabled={index === 0}
-              className="px-2 py-1 bg-gray-300 rounded text-xs hover:bg-gray-400 disabled:opacity-50"
+              className="px-3 py-2 bg-gray-300 rounded text-sm font-bold hover:bg-gray-400 disabled:opacity-50"
             >
               ↑
             </button>
             <button
               onClick={() => handleReorder(index, 'down')}
               disabled={index === list.length - 1}
-              className="px-2 py-1 bg-gray-300 rounded text-xs hover:bg-gray-400 disabled:opacity-50"
+              className="px-3 py-2 bg-gray-300 rounded text-sm font-bold hover:bg-gray-400 disabled:opacity-50"
             >
               ↓
             </button>
@@ -177,29 +216,78 @@ export default function TasksDisplay({ spec, onClose }) {
           {/* Export Options */}
           <div className="flex flex-wrap gap-2 mb-4 pb-4 border-b">
             <button
+              onClick={() => setIsAddingNew(!isAddingNew)}
+              className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 text-sm font-bold transition"
+            >
+              ➕ Add {activeTab === 'stories' ? 'Story' : 'Task'}
+            </button>
+            <button
               onClick={handleCopyToClipboard}
-              className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-sm"
+              className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-sm font-bold"
             >
               📋 Copy Markdown
             </button>
             <button
               onClick={() => handleExport('markdown')}
-              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
+              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm font-bold"
             >
               📥 Download Markdown
             </button>
             <button
               onClick={() => handleExport('text')}
-              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
+              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm font-bold"
             >
               📥 Download Text
             </button>
           </div>
 
+          {/* Add New Item Form */}
+          {isAddingNew && (activeTab === 'stories' || activeTab === 'tasks') && (
+            <div className="bg-purple-50 border-2 border-purple-300 p-4 mb-4 rounded">
+              <h3 className="text-lg font-bold text-gray-900 mb-3">➕ Add New {activeTab === 'stories' ? 'User Story' : 'Engineering Task'}</h3>
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-lg font-bold text-gray-900 mb-2">📌 Title</label>
+                  <input
+                    type="text"
+                    value={newItem.title}
+                    onChange={(e) => setNewItem({...newItem, title: e.target.value})}
+                    placeholder="Enter title..."
+                    className="w-full px-4 py-3 border-2 border-gray-500 rounded font-semibold text-lg text-gray-900 focus:outline-none focus:border-purple-600"
+                  />
+                </div>
+                <div>
+                  <label className="block text-lg font-bold text-gray-900 mb-2">📝 Description</label>
+                  <textarea
+                    value={newItem.description}
+                    onChange={(e) => setNewItem({...newItem, description: e.target.value})}
+                    placeholder="Enter description..."
+                    className="w-full px-4 py-3 border-2 border-gray-500 rounded font-semibold text-lg text-gray-900 focus:outline-none focus:border-purple-600"
+                    rows="3"
+                  />
+                </div>
+                <div className="flex gap-3">
+                  <button
+                    onClick={handleAddNew}
+                    className="px-5 py-2 bg-purple-600 text-white rounded text-base font-bold hover:bg-purple-700 transition"
+                  >
+                    ✓ Add Item
+                  </button>
+                  <button
+                    onClick={() => setIsAddingNew(false)}
+                    className="px-5 py-2 bg-gray-400 text-white rounded text-base font-bold hover:bg-gray-500 transition"
+                  >
+                    ✕ Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Tabs */}
           <div className="flex gap-2 mb-4 border-b">
             <button
-              onClick={() => setActiveTab('stories')}
+              onClick={() => { setActiveTab('stories'); setIsAddingNew(false); }}
               className={`px-4 py-2 font-medium ${
                 activeTab === 'stories'
                   ? 'text-blue-600 border-b-2 border-blue-600'
@@ -209,7 +297,7 @@ export default function TasksDisplay({ spec, onClose }) {
               User Stories ({items.length})
             </button>
             <button
-              onClick={() => setActiveTab('tasks')}
+              onClick={() => { setActiveTab('tasks'); setIsAddingNew(false); }}
               className={`px-4 py-2 font-medium ${
                 activeTab === 'tasks'
                   ? 'text-blue-600 border-b-2 border-blue-600'
@@ -219,7 +307,7 @@ export default function TasksDisplay({ spec, onClose }) {
               Engineering Tasks ({tasks.length})
             </button>
             <button
-              onClick={() => setActiveTab('risks')}
+              onClick={() => { setActiveTab('risks'); setIsAddingNew(false); }}
               className={`px-4 py-2 font-medium ${
                 activeTab === 'risks'
                   ? 'text-blue-600 border-b-2 border-blue-600'
@@ -293,12 +381,18 @@ export default function TasksDisplay({ spec, onClose }) {
           </div>
         </div>
 
-        <div className="bg-gray-100 px-6 py-4 rounded-b-lg flex justify-end gap-2">
+        <div className="bg-gray-100 px-6 py-4 rounded-b-lg flex justify-between gap-2">
+          <button
+            onClick={handleSaveEdits}
+            className="px-4 py-2 bg-blue-600 text-white rounded font-bold hover:bg-blue-700 transition text-sm"
+          >
+            💾 Save All Edits
+          </button>
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
+            className="px-4 py-2 bg-gray-600 text-white rounded font-bold hover:bg-gray-700 transition text-sm"
           >
-            Close
+            ✕ Close
           </button>
         </div>
       </div>

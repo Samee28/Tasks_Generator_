@@ -66,7 +66,7 @@ Ensure the response is valid JSON and includes 5-10 user stories and 8-15 engine
     let endpoint, model;
     if (provider === 'groq') {
       endpoint = 'https://api.groq.com/openai/v1/chat/completions';
-      model = process.env.GROQ_MODEL || 'mixtral-8x7b-32768';
+      model = process.env.GROQ_MODEL || 'llama-3.3-70b-versatile';
     } else {
       endpoint = 'https://api.openai.com/v1/chat/completions';
       model = process.env.OPENAI_MODEL || 'gpt-3.5-turbo';
@@ -90,6 +90,7 @@ Ensure the response is valid JSON and includes 5-10 user stories and 8-15 engine
             content: prompt,
           },
         ],
+        response_format: { type: 'json_object' },
         temperature: 0.7,
         max_tokens: 2000,
       }),
@@ -105,12 +106,28 @@ Ensure the response is valid JSON and includes 5-10 user stories and 8-15 engine
     }
 
     const data = await response.json();
-    let content = data.choices[0].message.content;
+    let content = data.choices?.[0]?.message?.content || '';
 
-    // Strip markdown code blocks if present
-    if (content.includes('```')) {
-      content = content.replace(/```json?\n?/g, '').replace(/```/g, '').trim();
-    }
+    const extractJson = (raw) => {
+      if (!raw) return '';
+      let cleaned = raw.trim();
+      if (cleaned.includes('```')) {
+        cleaned = cleaned.replace(/```json?\n?/g, '').replace(/```/g, '').trim();
+      }
+      const firstBrace = cleaned.indexOf('{');
+      const lastBrace = cleaned.lastIndexOf('}');
+      if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+        return cleaned.slice(firstBrace, lastBrace + 1);
+      }
+      return cleaned;
+    };
+    const sanitizeJson = (raw) => {
+      let cleaned = extractJson(raw);
+      cleaned = cleaned.replace(/\u0000/g, '');
+      cleaned = cleaned.replace(/,\s*([}\]])/g, '$1');
+      return cleaned.trim();
+    };
+    content = sanitizeJson(content);
 
     // Parse the JSON response
     let parsedContent;

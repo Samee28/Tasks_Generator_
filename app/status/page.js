@@ -123,7 +123,7 @@ export default function StatusPage() {
               {status.llm === 'checking' ? 'Checking...' : status.llm === 'healthy' ? 'Connected' : status.llm === 'not_configured' ? 'Not Configured' : 'Error'}
             </div>
             <p className="text-sm text-gray-600 mt-4">
-              {status.llm === 'not_configured' ? 'Please set OPENAI_API_KEY in .env.local' : `OpenAI API is ${status.llm === 'healthy' ? 'responding' : 'unreachable'}`}
+              {status.llm === 'not_configured' ? 'Please set GROQ_API_KEY in .env.local' : `Groq API is ${status.llm === 'healthy' ? 'responding' : 'unreachable'}`}
             </p>
           </div>
         </div>
@@ -143,7 +143,7 @@ export default function StatusPage() {
           <ul className="space-y-2 text-gray-700">
             <li><strong>Backend:</strong> Your Next.js API is always running on the same domain</li>
             <li><strong>Database:</strong> Using browser localStorage for specs - no server-side persistence needed</li>
-            <li><strong>LLM:</strong> Requires OpenAI API key. Set it in .env.local file</li>
+            <li><strong>LLM:</strong> Requires Groq API key. Set GROQ_API_KEY in .env.local file</li>
             <li>This page refreshes every 30 seconds automatically</li>
           </ul>
         </div>

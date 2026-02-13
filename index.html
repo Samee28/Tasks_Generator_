@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tasks Generator - Mini Planning Tool</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📋 Tasks Generator</h1>
+            <p class="subtitle">Generate user stories and engineering tasks from your feature ideas</p>
+        </header>
+
+        <main>
+            <!-- Input Form Section -->
+            <section class="form-section">
+                <h2>Feature Specification</h2>
+                <form id="featureForm">
+                    <div class="form-group">
+                        <label for="goal">Goal *</label>
+                        <textarea 
+                            id="goal" 
+                            name="goal" 
+                            rows="3" 
+                            placeholder="What is the main objective of this feature?"
+                            required
+                        ></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="users">Target Users *</label>
+                        <textarea 
+                            id="users" 
+                            name="users" 
+                            rows="2" 
+                            placeholder="Who will use this feature?"
+                            required
+                        ></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="constraints">Constraints</label>
+                        <textarea 
+                            id="constraints" 
+                            name="constraints" 
+                            rows="2" 
+                            placeholder="Any technical or business constraints?"
+                        ></textarea>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="submit" class="btn btn-primary">Generate Tasks</button>
+                        <button type="button" class="btn btn-secondary" id="clearBtn">Clear Form</button>
+                        <button type="button" class="btn btn-secondary" id="historyBtn">View History</button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- Generated Tasks Section -->
+            <section class="tasks-section" id="tasksSection" style="display: none;">
+                <div class="section-header">
+                    <h2>Generated Tasks</h2>
+                    <div class="button-group">
+                        <button class="btn btn-success" id="exportBtn">📋 Copy to Clipboard</button>
+                        <button class="btn btn-success" id="downloadBtn">📥 Download</button>
+                        <button class="btn btn-secondary" id="newSpecBtn">New Specification</button>
+                    </div>
+                </div>
+
+                <!-- User Stories -->
+                <div class="task-group">
+                    <h3>User Stories</h3>
+                    <ul id="userStories" class="task-list sortable"></ul>
+                    <button class="btn btn-small" id="addStoryBtn">+ Add User Story</button>
+                </div>
+
+                <!-- Engineering Tasks -->
+                <div class="task-group">
+                    <h3>Engineering Tasks</h3>
+                    <ul id="engineeringTasks" class="task-list sortable"></ul>
+                    <button class="btn btn-small" id="addTaskBtn">+ Add Engineering Task</button>
+                </div>
+            </section>
+
+            <!-- History Section -->
+            <section class="history-section" id="historySection" style="display: none;">
+                <div class="section-header">
+                    <h2>Recent Specifications (Last 5)</h2>
+                    <button class="btn btn-secondary" id="closeHistoryBtn">Close</button>
+                </div>
+                <div id="historyList" class="history-list"></div>
+            </section>
+        </main>
+
+        <footer>
+            <p>Mini Planning Tool - Generate and manage feature tasks efficiently</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

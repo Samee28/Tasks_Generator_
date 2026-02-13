@@ -5,10 +5,6 @@
 **Name**: Sameeksha  
 **Email**: rsameeksha8@gmail.com
 
-## Portfolio
-
-Master of Computer Applications Portfolio
-
 ## Education
 
 - **National Institute of Technology, Warangal** — Master of Computer Applications (MCA)  

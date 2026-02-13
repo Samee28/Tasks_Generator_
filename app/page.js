@@ -1,65 +1,114 @@
-import Image from "next/image";
+'use client';
+
+import { useState } from 'react';
+import TaskGeneratorForm from './components/TaskGeneratorForm';
+import TasksDisplay from './components/TasksDisplay';
+import RecentSpecs from './components/RecentSpecs';
+import { saveSpec } from './lib/storage';
 
 export default function Home() {
+  const [isLoading, setIsLoading] = useState(false);
+  const [selectedSpec, setSelectedSpec] = useState(null);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+
+  const handleTasksGenerated = async (formData, generatedData) => {
+    setIsLoading(true);
+    try {
+      const spec = {
+        goal: formData.goal,
+        users: formData.users,
+        constraints: formData.constraints,
+        template: formData.template,
+        data: generatedData,
+      };
+      saveSpec(spec);
+      setSelectedSpec(spec);
+      setRefreshTrigger(prev => prev + 1);
+    } catch (error) {
+      console.error('Error saving spec:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSelectSpec = (spec) => {
+    setSelectedSpec(spec);
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.js file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">📋 Tasks Generator</h1>
+          <p className="text-lg text-gray-600">Transform feature ideas into user stories, engineering tasks & risks</p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
+
+        {/* Navigation */}
+        <div className="flex gap-2 mb-6">
           <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+            href="/"
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+            Home
+          </a>
+          <a
+            href="/status"
+            className="px-4 py-2 bg-white text-gray-700 rounded-lg hover:bg-gray-50 border border-gray-300 font-medium"
+          >
+            Status
+          </a>
+        </div>
+
+        {/* Main Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Left Column - Form */}
+          <div className="lg:col-span-2">
+            <div className="bg-white rounded-lg shadow-lg p-6">
+              <h2 className="text-2xl font-bold text-gray-800 mb-4">Create New Spec</h2>
+              <TaskGeneratorForm 
+                onTasksGenerated={handleTasksGenerated}
+                isLoading={isLoading}
+              />
+            </div>
+          </div>
+
+          {/* Right Column - Recent Specs */}
+          <div className="bg-white rounded-lg shadow-lg p-6">
+            <RecentSpecs 
+              onSelectSpec={handleSelectSpec}
+              key={`recent-${refreshTrigger}`}
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+          </div>
         </div>
-      </main>
+
+        {/* Steps Guide */}
+        <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="bg-white rounded-lg shadow p-6">
+            <div className="text-3xl mb-2">1️⃣</div>
+            <h3 className="font-bold text-gray-800 mb-2">Fill the Form</h3>
+            <p className="text-gray-600 text-sm">Describe your feature goal, target users, and constraints</p>
+          </div>
+          <div className="bg-white rounded-lg shadow p-6">
+            <div className="text-3xl mb-2">2️⃣</div>
+            <h3 className="font-bold text-gray-800 mb-2">AI Generates Tasks</h3>
+            <p className="text-gray-600 text-sm">AI creates user stories, engineering tasks, and identifies risks</p>
+          </div>
+          <div className="bg-white rounded-lg shadow p-6">
+            <div className="text-3xl mb-2">3️⃣</div>
+            <h3 className="font-bold text-gray-800 mb-2">Edit & Export</h3>
+            <p className="text-gray-600 text-sm">Edit, reorder, and export your spec as markdown or text</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Task Display Modal */}
+      {selectedSpec && (
+        <TasksDisplay 
+          spec={selectedSpec}
+          onClose={() => setSelectedSpec(null)}
+        />
+      )}
     </div>
   );
 }

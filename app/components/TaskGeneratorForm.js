@@ -133,17 +133,17 @@ export default function TaskGeneratorForm({ onTasksGenerated, isLoading }) {
       </div>
 
       {error && (
-        <div className="p-3 bg-red-100 border border-red-400 text-red-700 rounded">
-          {error}
+        <div className="p-4 bg-red-600 text-white border-l-4 border-red-800 rounded-lg shadow-lg text-center font-bold text-lg">
+          🚨 {error}
         </div>
       )}
 
       <button
         type="submit"
         disabled={isLoading}
-        className="w-full bg-blue-600 text-white py-2 rounded-md font-medium hover:bg-blue-700 disabled:bg-gray-400 transition"
+        className="w-full bg-blue-600 text-white py-3 rounded-md font-bold text-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition shadow-lg"
       >
-        {isLoading ? 'Generating Tasks...' : 'Generate Tasks & Stories'}
+        {isLoading ? '⏳ Generating Tasks... (30-45 seconds)' : '✨ Generate Tasks & Stories'}
       </button>
     </form>
   );

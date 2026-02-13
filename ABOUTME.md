@@ -3,9 +3,7 @@
 ## Personal Information
 
 **Name**: Sameeksha  
-**Phone**: +91-9691739365  
-**Roll No.**: 23MCF1R37  
-**Email**: raisameeksha174@gmail.com
+**Email**: rsameeksha8@gmail.com
 
 ## Portfolio
 

@@ -7,13 +7,13 @@ This document explains what AI tools were used in development, what was manually
 ## AI Tools Used
 
 ### 1. **Task Generation - Groq API (Primary)**
-- **LLM**: Mixtral 8x7B  
+- **LLM**: Llama 3.3 70B  
 - **Provider**: Groq (https://groq.com)
 - **Why Groq?**
   - **Cost**: $0.27 per 1M tokens (10x cheaper than OpenAI)
   - **Speed**: 100-200 tokens/second (2-3x faster than OpenAI)
   - **Reliability**: Very high JSON parsing success rate
-  - **Open Source Model**: Mixtral is open-source, well-tested
+  - **Open Source Model**: Llama 3.3 is open-source, state-of-the-art
   - **Easy Integration**: OpenAI-compatible API format
   - **No Vendor Lock-in**: Can easily switch to other providers
 

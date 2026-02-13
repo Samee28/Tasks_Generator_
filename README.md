@@ -41,6 +41,7 @@ A modern web app that transforms feature ideas into actionable user stories, eng
    ```
    GROQ_API_KEY=gsk_...your_groq_key...
    LLM_PROVIDER=groq
+   GROQ_MODEL=llama-3.3-70b-versatile
    ```
    
    Or use OpenAI instead:
@@ -85,8 +86,8 @@ A modern web app that transforms feature ideas into actionable user stories, eng
 1. **Fill the form** with:
    - **Feature Goal**: What you want to build
    - **Target Users**: Who will use it
-   - **Constraints**: Limitations, timeline, budget, etc.
-   - **Project Type** (optional): Mobile App, Web App, etc.
+   - **Constraints**: Limitations, technical requirements, etc.
+   - **Project Type** (optional): Mobile App, Web App, Internal Tool, or API
 
 2. **Click "Generate Tasks & Stories"** and wait for AI to process
 
@@ -158,7 +159,7 @@ Create `.env.local` (not committed to git):
 ```
 GROQ_API_KEY=gsk_...
 LLM_PROVIDER=groq
-GROQ_MODEL=mixtral-8x7b-32768
+GROQ_MODEL=llama-3.3-70b-versatile
 ```
 
 **Option 2: OpenAI**
@@ -218,7 +219,7 @@ Edit the prompt in `app/api/generate-tasks/route.js` to customize:
 - **Framework**: Next.js 14+ (React)
 - **Styling**: Tailwind CSS
 - **Storage**: Browser localStorage
-- **AI/LLM**: Groq API (Mixtral 8x7B) - Or OpenAI as fallback
+- **AI/LLM**: Groq API (Llama 3.3 70B) - Or OpenAI as fallback
 - **Hosting**: Vercel
 - **Language**: JavaScript (ES6+)
 

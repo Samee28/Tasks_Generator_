@@ -26,7 +26,7 @@ export async function POST(request) {
 Goal: ${goal}
 Target Users: ${users}
 Constraints: ${constraints}
-${template ? `Project Type/Template: ${template}` : ''}
+${template ? `Project Type: ${template}` : ''}
 
 Generate the response in the following JSON format:
 {
@@ -105,7 +105,12 @@ Ensure the response is valid JSON and includes 5-10 user stories and 8-15 engine
     }
 
     const data = await response.json();
-    const content = data.choices[0].message.content;
+    let content = data.choices[0].message.content;
+
+    // Strip markdown code blocks if present
+    if (content.includes('```')) {
+      content = content.replace(/```json?\n?/g, '').replace(/```/g, '').trim();
+    }
 
     // Parse the JSON response
     let parsedContent;

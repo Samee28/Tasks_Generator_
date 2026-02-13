@@ -62,7 +62,7 @@ function clearForm() {
 
 function startNewSpec() {
     tasksSection.style.display = 'none';
-    featureForm.style.display = 'block';
+    document.querySelector('.form-section').style.display = 'block';
     currentSpec = null;
     clearForm();
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -199,7 +199,7 @@ function addNewItem(type) {
 }
 
 function showTasksSection() {
-    featureForm.parentElement.style.display = 'none';
+    document.querySelector('.form-section').style.display = 'none';
     tasksSection.style.display = 'block';
     historySection.style.display = 'none';
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -423,7 +423,7 @@ function deleteFromHistory(index) {
 
 function showHistory() {
     loadHistory();
-    featureForm.parentElement.style.display = 'none';
+    document.querySelector('.form-section').style.display = 'none';
     tasksSection.style.display = 'none';
     historySection.style.display = 'block';
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -435,7 +435,7 @@ function hideHistory() {
     if (currentSpec && currentSpec.userStories) {
         showTasksSection();
     } else {
-        featureForm.parentElement.style.display = 'block';
+        document.querySelector('.form-section').style.display = 'block';
     }
 }
 
